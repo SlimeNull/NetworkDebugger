@@ -1,0 +1,74 @@
+﻿<ui:UiPage x:Class="NetworkDebugger.Views.Pages.TcpClientPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:NetworkDebugger.Views.Pages"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:com="clr-namespace:NetworkDebugger.Views.Components"
+      xmlns:page="clr-namespace:NetworkDebugger.Views.Pages"
+      xmlns:vm="clr-namespace:NetworkDebugger.ViewModels"
+      xmlns:utils="clr-namespace:NetworkDebugger.Utils"
+      mc:Ignorable="d"
+      d:DesignHeight="450" d:DesignWidth="800"
+      d:DataContext="{d:DesignInstance vm:TcpClientViewModel, IsDesignTimeCreatable=False}"
+      Title="TcpClient">
+
+    <Grid>
+        <Grid Margin="0, 0, 0, 15">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <ui:CardExpander Margin="0, 0, 15, 0" IsExpanded="{Binding ViewModel.OptionExpanded}">
+                <ui:CardExpander.Header>
+                    <TextBlock>Connection options.</TextBlock>
+                </ui:CardExpander.Header>
+                <VirtualizingStackPanel>
+                    <ui:TextBox PlaceholderText="Listening address (empty for loopback)" Text="{Binding ViewModel.RemoteAddr}"/>
+                    <ui:NumberBox PlaceholderText="Listening port" Margin="0, 10, 0, 0" IntegersOnly="True"
+                                      Value="{Binding ViewModel.RemotePort}" Step="1" Min="0" Max="65535"/>
+                    <Grid Margin="0, 10, 0, 0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" HorizontalAlignment="Left" Orientation="Horizontal">
+                            <ComboBox ItemsSource="{x:Static utils:EncodingUtils.AllSupportedEncoding}"
+                                          SelectedItem="{Binding ViewModel.DefaultEncoding}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding EncodingName}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+
+                            <ui:NumberBox Margin="10, 0, 0, 0" PlaceholderText="Buffer Size" IntegersOnly="True"
+                                              Step="1" Min="256" Max="8192" Value="{Binding ViewModel.BufferSize}"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal">
+                            <Button Content="Connect"
+                                        Command="{Binding ViewModel.ConnectCommand}"/>
+                        </StackPanel>
+                    </Grid>
+                </VirtualizingStackPanel>
+            </ui:CardExpander>
+            <ui:VirtualizingItemsControl Grid.Row="1" ItemsSource="{Binding ViewModel.Clients}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <ui:CardExpander Header="{Binding Name}" Margin="0, 10, 15, 0">
+                            <com:TcpClientCtrlComponent DataContext="{Binding}"/>
+                        </ui:CardExpander>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ui:VirtualizingItemsControl>
+        </Grid>
+    </Grid>
+</ui:UiPage>
